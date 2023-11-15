@@ -20,6 +20,11 @@ notes = {
 note_sequence = ['D4', 'A4', 'A4', 'F4', 'E4', 'D4','C4', 'A3','C4', 'D4', 'E4', 'F4', 'G4', 'F4', 'E4','D4']             
 note_duration = [100, 150, 50, 50, 50, 100, 90, 50,  50, 100, 50,50, 50, 50, 100, 190] 
 
+#disappointing_melody = ['C4', 'C4', 'D4', 'D4', 'E4', 'E4', 'F4', 'F4']
+#disappointing_duration = [100, 100, 100, 100, 100, 100, 100, 100]
+
+disappointing_melody = ['A4', 'A3']
+disappointing_duration = [100, 200]
 
 def play_sound(duration, frequency):
     period = 1.0 / frequency 
@@ -41,7 +46,16 @@ cv2.startWindowThread()
 picam2 = Picamera2()
 #camera_config = picam2.create_still_configuration(main={"size":(320,240)})
 #picam2.configure(camera_config)    
-picam2.configure(picam2.create_preview_configuration(main={"format": 'XRGB8888', "size": (640, 480)}))
+#picam2.configure(picam2.create_preview_configuration(main={"format": 'XRGB8888', "size": (640, 480)}))
+
+#low quality
+picam2.configure(picam2.create_preview_configuration(main={"format": 'XRGB8888', "size": (320, 240)})) 
+
+#high quality
+#picam2.configure(picam2.create_preview_configuration(main={"format": 'XRGB8888', "size": (1920, 1080)}))
+
+
+
 picam2.start()
 
 try: # Start of a loop
@@ -55,17 +69,21 @@ try: # Start of a loop
                          im = picam2.capture_array()
                          grey = cv2.cvtColor(im,cv2.COLOR_BGR2GRAY)
                          faces = face_detector.detectMultiScale(grey, 1.3, 5)     
-                         for (x,y,w,h) in faces:
-                           cv2.rectangle(im,(x,y),(x+w,y+h),(255,255,0),2)
-                         cv2.imshow("Camera", im)
+                         #for (x,y,w,h) in faces:
+                          # cv2.rectangle(im,(x,y),(x+w,y+h),(255,255,0),2)
+                         #cv2.imshow("Camera", im)
                          cv2.waitKey(1)
                          if len(faces) > 0:
                            print("Pojem pesem")
                            print("Face detected.")
                            for duration,n in zip(note_duration,note_sequence):
                              play_sound(duration, notes[n])
+                           time.sleep(1)
                          else:
                            print("No face detected.") 
+                           for duration, n in zip(disappointing_duration, disappointing_melody):
+                             play_sound(duration, notes[n])
+                           time.sleep(1)
                  time.sleep(0.5) # wait 0,5 second
 
 except KeyboradInterrupt:
